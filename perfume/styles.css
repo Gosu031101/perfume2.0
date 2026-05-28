@@ -1,0 +1,11 @@
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+body { background-color: #f9fafb; font-family: system-ui, -apple-system, sans-serif; }
+.toast {
+    transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(20px);
+    opacity: 0;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.modal-enter { animation: fadeIn 0.2s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

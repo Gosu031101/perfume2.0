@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thành Luân - Nước Hoa Cao Cấp</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- SheetJS để đọc/ghi file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="text-gray-800">
+
+<div class="min-h-screen flex flex-col bg-white max-w-[1200px] mx-auto shadow-xl relative overflow-x-hidden">
+
+    <!-- HEADER (Responsive PC/Mobile) -->
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-30">
+        <div class="px-4 py-3 flex justify-between items-center relative z-40 bg-white">
+            
+            <!-- Logo & Mobile Menu Icon -->
+            <div class="flex items-center gap-3">
+                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl text-gray-700 hover:text-black focus:outline-none">
+                    <i class="ph ph-list"></i>
+                </button>
+                <h1 class="font-serif text-2xl font-bold tracking-widest text-black uppercase cursor-pointer">Thành Luân</h1>
+            </div>
+
+            <!-- PC Navigation Menu (Ẩn trên Mobile) -->
+            <nav class="hidden md:flex gap-8 items-center font-medium text-sm text-gray-600">
+                <div class="relative group py-2">
+                    <a href="#" onclick="filterByCategory('', event)" class="hover:text-black transition border-b-2 border-transparent group-hover:border-black pb-1 flex items-center gap-1">
+                        Nước Hoa <i class="ph ph-caret-down text-xs"></i>
+                    </a>
+                    <div class="absolute left-0 top-full w-40 bg-white border border-gray-100 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 flex flex-col overflow-hidden">
+                        <a href="#" onclick="filterByCategory('', event)" class="px-4 py-2 hover:bg-gray-50 hover:text-black transition text-sm">Tất cả</a>
+                        <a href="#" onclick="filterByCategory('nam', event)" class="px-4 py-2 hover:bg-gray-50 hover:text-black transition text-sm">Nam</a>
+                        <a href="#" onclick="filterByCategory('nữ', event)" class="px-4 py-2 hover:bg-gray-50 hover:text-black transition text-sm">Nữ</a>
+                        <a href="#" onclick="filterByCategory('unisex', event)" class="px-4 py-2 hover:bg-gray-50 hover:text-black transition text-sm">Unisex</a>
+                        <a href="#" onclick="filterByCategory('arab', event)" class="px-4 py-2 hover:bg-gray-50 hover:text-black transition text-sm">Arab</a>
+                    </div>
+                </div>
+                <a href="#" class="hover:text-black transition border-b-2 border-transparent hover:border-black pb-1">Xịt Body</a>
+                <a href="#" class="hover:text-black transition border-b-2 border-transparent hover:border-black pb-1">Sáp Lăn Khử Mùi</a>
+                <a href="#" class="hover:text-black transition border-b-2 border-transparent hover:border-black pb-1">Nến</a>
+            </nav>
+
+            <!-- Header Actions -->
+                <div class="flex items-center gap-4 md:gap-5">
+                    <!-- Language Switcher -->
+                    <div class="hidden sm:flex items-center gap-2">
+                        <button id="lang-vi" onclick="setLang('vi')" class="text-sm font-medium">VI</button>
+                        <button id="lang-en" onclick="setLang('en')" class="text-sm text-gray-400">EN</button>
+                    </div>
+                <!-- Icon Search -->
+                <button onclick="toggleSearch()" class="text-2xl text-gray-700 hover:text-black transition focus:outline-none">
+                    <i class="ph ph-magnifying-glass"></i>
+                </button>
+                
+                <!-- Icon Cart -->
+                <button onclick="toggleCart()" class="relative text-gray-700 hover:text-black transition focus:outline-none">
+                    <i class="ph ph-shopping-bag text-2xl"></i>
+                    <span id="cart-badge" class="absolute -top-1 -right-2 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                </button>
+                
+                <!-- Icon Profile / User Info -->
+                <button onclick="openAuthModal()" class="flex items-center gap-2 text-gray-700 hover:text-black transition focus:outline-none">
+                    <i class="ph ph-user text-2xl"></i>
+                    <span id="header-user-name" class="hidden md:block text-sm font-medium">Đăng nhập</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SEARCH BAR (Drop down from header) -->
+        <div id="search-container" class="absolute left-0 right-0 bg-white border-b border-gray-100 shadow-md p-3 transform -translate-y-full transition-transform duration-300 -z-10">
+            <div class="relative max-w-2xl mx-auto flex items-center">
+                <i class="ph ph-magnifying-glass absolute left-3 text-gray-400 text-lg"></i>
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Tìm kiếm theo tên hoặc thương hiệu..." class="w-full bg-gray-100 rounded-lg pl-10 pr-10 py-2.5 text-sm outline-none focus:ring-1 ring-black">
+                <button onclick="toggleSearch()" class="absolute right-3 text-gray-400 hover:text-black"><i class="ph ph-x"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE MENU DRAWER -->
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0" onclick="toggleMobileMenu()"></div>
+    <div id="mobile-menu-drawer" class="fixed top-0 left-0 bottom-0 w-3/4 max-w-sm bg-white z-50 transform -translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <div class="px-5 py-4 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-serif text-xl font-bold tracking-widest">MENU</h2>
+            <button onclick="toggleMobileMenu()" class="text-gray-500 hover:text-black"><i class="ph ph-x text-xl"></i></button>
+        </div>
+        <nav class="flex-1 overflow-y-auto flex flex-col p-4 space-y-2">
+            <a href="#" onclick="filterByCategory('', event)" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Tất cả Nước hoa <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" onclick="filterByCategory('nam', event)" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Nước hoa Nam <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" onclick="filterByCategory('nữ', event)" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Nước hoa Nữ <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" onclick="filterByCategory('unisex', event)" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Unisex <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" onclick="filterByCategory('arab', event)" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Nước hoa Ả Rập <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Xịt body <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" class="px-4 py-3 text-gray-800 font-medium border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 rounded">Sáp lăn khử mùi <i class="ph ph-caret-right text-gray-400"></i></a>
+            <a href="#" class="px-4 py-3 text-gray-800 font-medium flex items-center justify-between hover:bg-gray-50 rounded">Nến thơm <i class="ph ph-caret-right text-gray-400"></i></a>
+        </nav>
+    </div>
+
+    <!-- BANNER -->
+    <div class="relative w-full h-48 md:h-[400px] bg-gray-900">
+        <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=1200&q=80" alt="Banner" class="w-full h-full object-cover opacity-70">
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-white px-4 text-center">
+            <h2 class="text-3xl md:text-5xl font-serif font-bold mb-2">Hương Thơm Của Riêng Bạn</h2>
+            <p class="text-sm md:text-base opacity-90 max-w-lg">Hàng ngàn mẫu nước hoa chính hãng cao cấp đang chờ bạn khám phá. Tích điểm và nhận ưu đãi đặc quyền lên tới 15%.</p>
+        </div>
+    </div>
+
+    <!-- DANH SÁCH SẢN PHẨM -->
+    <main class="flex-1 p-4 md:p-8 pb-20">
+        <div class="flex justify-between items-end mb-6">
+            <h3 class="font-serif text-xl md:text-2xl font-bold border-b-2 border-black pb-1">Sản Phẩm Nổi Bật</h3>
+            <span id="product-count" class="text-sm text-gray-500">0 sản phẩm</span>
+        </div>
+        
+        <!-- Grid hiển thị (2 cột trên mobile, 4 cột trên PC) -->
+        <div id="product-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            <!-- Render via JS -->
+        </div>
+
+        <!-- Nút Xem Thêm (Hiện ra khi còn sản phẩm chưa hiển thị) -->
+        <div id="load-more-container" class="mt-10 text-center hidden">
+            <button id="load-more-btn" onclick="loadMoreProducts()" class="bg-white border border-black text-black px-8 py-2.5 rounded font-medium text-sm hover:bg-black hover:text-white transition-colors active:scale-95 shadow-sm">
+            </button>
+        </div>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- MODAL AUTH (ĐĂNG NHẬP / ĐĂNG KÝ / PROFILE) -->
+    <!-- ============================================== -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden backdrop-blur-sm">
+        <div class="bg-white rounded-xl w-11/12 max-w-md p-6 relative shadow-2xl modal-enter max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-black">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            
+            <!-- View: Profile (Khi đã login) -->
+            <div id="profile-view" class="hidden">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="ph ph-user text-3xl text-gray-400"></i>
+                    </div>
+                    <h2 id="profile-name" class="font-serif text-2xl font-bold">Tên User</h2>
+                    <p id="profile-email" class="text-sm text-gray-500">email@example.com</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-lg p-4 mb-6 shadow-md">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm opacity-80">Hạng Thành Viên</span>
+                        <span id="profile-rank-name" class="font-bold text-yellow-400">Vàng</span>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <span id="profile-points" class="text-2xl font-bold">1200</span>
+                            <span class="text-xs opacity-70"> điểm</span>
+                        </div>
+                        <span id="profile-discount" class="text-sm font-medium bg-white/20 px-2 py-1 rounded">Giảm 10%</span>
+                    </div>
+                    <p id="profile-next-rank" class="text-xs mt-3 opacity-70">Cần 300 điểm nữa để lên hạng Bạch Kim</p>
+                </div>
+
+                <div class="text-xs text-gray-500 mb-4 p-3 bg-gray-50 rounded border border-gray-100">
+                    <p class="font-semibold mb-1">Chính sách ưu đãi:</p>
+                    <ul class="space-y-1 ml-4 list-disc">
+                        <li>Đồng (0đ): Giảm 5%</li>
+                        <li>Bạc (500đ): Giảm 8%</li>
+                        <li>Vàng (1000đ): Giảm 10%</li>
+                        <li>Bạch kim (1500đ): Giảm 15%</li>
+                    </ul>
+                </div>
+
+                <button onclick="logout()" class="w-full border border-red-500 text-red-600 font-medium py-2.5 rounded text-sm hover:bg-red-50 transition">
+                    Đăng Xuất
+                </button>
+            </div>
+
+            <!-- View: Login / Register (Khi chưa login) -->
+            <div id="login-view" class="block">
+                <div class="flex mb-6 border-b">
+                    <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 pb-2 font-medium text-sm border-b-2 border-black">Đăng Nhập</button>
+                    <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 pb-2 font-medium text-sm text-gray-400 border-b-2 border-transparent">Đăng Ký</button>
+                </div>
+
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div id="field-name" class="hidden">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Họ và tên</label>
+                        <input type="text" id="auth-name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" placeholder="Nhập họ tên">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="auth-email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" placeholder="Email của bạn" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Mật khẩu</label>
+                        <input type="password" id="auth-password" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" placeholder="••••••••" required>
+                    </div>
+                    
+                    <button type="submit" id="auth-submit-btn" class="w-full bg-black text-white font-medium py-2.5 rounded text-sm mt-2 hover:bg-gray-800 transition shadow-md">
+                        Đăng Nhập
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- GIỎ HÀNG SLIDE-OUT (Drawer Modal) -->
+    <!-- ============================================== -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity" onclick="toggleCart()"></div>
+    <div id="cart-drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        
+        <div class="px-5 py-4 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="font-serif text-xl font-bold flex items-center gap-2"><i class="ph ph-shopping-bag text-2xl"></i> Giỏ Hàng</h2>
+            <button onclick="toggleCart()" class="text-gray-500 hover:text-black bg-white p-1 rounded-md shadow-sm border border-gray-200"><i class="ph ph-x text-lg"></i></button>
+        </div>
+
+        <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- Danh sách sản phẩm -->
+        </div>
+
+        <!-- Khung Thanh Toán & Khuyến Mãi -->
+        <div class="border-t p-5 bg-white shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+            <div id="checkout-discount-box" class="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm hidden">
+                <p class="font-medium text-yellow-800 flex justify-between">
+                    <span>Ưu đãi hạng <span id="cart-rank-name" class="font-bold">Đồng</span>:</span>
+                    <span id="cart-discount-amount" class="font-bold">-0đ</span>
+                </p>
+                <p class="text-xs text-yellow-600 mt-1">Khuyến mãi được tự động áp dụng.</p>
+            </div>
+
+            <div class="space-y-2 mb-4 text-sm">
+                <div class="flex justify-between text-gray-500">
+                    <span>Tạm tính:</span>
+                    <span id="cart-subtotal">0đ</span>
+                </div>
+                <div class="flex justify-between text-gray-500">
+                    <span>Phí vận chuyển:</span>
+                    <span>Miễn phí</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg pt-2 border-t text-black">
+                    <span>Tổng cộng:</span>
+                    <span id="cart-total" class="text-red-600">0đ</span>
+                </div>
+            </div>
+
+            <a href="checkout.html" class="w-full bg-black text-white font-bold py-3.5 rounded flex items-center justify-center gap-2 hover:bg-gray-800 transition shadow-lg">
+                <i class="ph ph-credit-card"></i> Tiến Hành Thanh Toán
+            </a>
+            <p class="text-[10px] text-center text-gray-400 mt-3">* Tích lũy 1 điểm cho mỗi 10.000đ thanh toán.</p>
+        </div>
+    </div>
+
+    <!-- TOAST THÔNG BÁO -->
+    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded shadow-xl text-sm z-50 flex items-center gap-2 pointer-events-none">
+        <i class="ph ph-info text-blue-400 text-lg"></i>
+        <span id="toast-message">Thông báo</span>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

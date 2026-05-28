@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Thanh Toán - Thành Luân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="max-w-[1200px] mx-auto min-h-screen flex flex-col bg-white shadow-xl relative overflow-x-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white border-b border-gray-100 p-4 flex items-center justify-between sticky top-0 z-30">
+            <a href="thanh_luan_perfume_html.html" class="text-gray-500 hover:text-black flex items-center gap-2 text-sm font-medium transition">
+                <i class="ph ph-arrow-left text-lg"></i> Về trang chủ
+            </a>
+            <h1 class="font-serif text-2xl font-bold tracking-widest text-black uppercase cursor-pointer">Thành Luân</h1>
+            <div class="w-24"></div> <!-- Spacer -->
+        </header>
+
+        <main class="flex-1 p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
+            
+            <!-- CỘT 1: FORM THÔNG TIN KHÁCH HÀNG -->
+            <div>
+                <h2 class="text-xl font-bold font-serif mb-6 border-b pb-2 flex items-center gap-2"><i class="ph ph-user"></i> Thông tin giao hàng</h2>
+                <form id="checkout-form" class="space-y-4" onsubmit="handleRealCheckout(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="checkout-email" required class="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black" placeholder="Nhập email của bạn để nhận hóa đơn">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên <span class="text-red-500">*</span></label>
+                        <input type="text" id="checkout-name" required class="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black" placeholder="Tên người nhận hàng">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại <span class="text-red-500">*</span></label>
+                            <input type="tel" id="checkout-phone" required class="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black" placeholder="SĐT liên hệ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tỉnh / Thành phố <span class="text-red-500">*</span></label>
+                            <input type="text" id="checkout-city" required class="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black" placeholder="VD: Hà Nội">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ chi tiết <span class="text-red-500">*</span></label>
+                        <textarea id="checkout-address" required rows="3" class="w-full border border-gray-300 rounded-md px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black" placeholder="Số nhà, tên đường, phường/xã..."></textarea>
+                    </div>
+                    
+                    <!-- Phương thức thanh toán -->
+                    <div class="pt-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phương thức thanh toán <span class="text-red-500">*</span></label>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="radio" name="payment-method" value="cod" checked onchange="toggleBankDetails()" class="w-4 h-4 text-black focus:ring-black accent-black">
+                                <div class="flex-1"><span class="block text-sm font-medium text-gray-800">Thanh toán khi nhận hàng (COD)</span></div>
+                                <i class="ph ph-money text-2xl text-gray-400"></i>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                                <input type="radio" name="payment-method" value="bank" onchange="toggleBankDetails()" class="w-4 h-4 text-black focus:ring-black accent-black">
+                                <div class="flex-1"><span class="block text-sm font-medium text-gray-800">Chuyển khoản ngân hàng</span></div>
+                                <i class="ph ph-bank text-2xl text-gray-400"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" id="main-submit-btn" class="w-full bg-black text-white font-bold py-3.5 rounded-md hover:bg-gray-800 transition shadow-lg flex items-center justify-center gap-2">
+                            <i class="ph ph-check-circle text-lg"></i> Hoàn tất đặt hàng
+                        </button>
+                        <!-- Nút ẩn để script.js bắt được sự kiện processCheckout cũ -->
+                        <button type="button" onclick="processCheckout()" class="hidden"></button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- CỘT 2: KHUNG GIỎ HÀNG -->
+            <div class="bg-gray-50 p-5 md:p-6 rounded-xl border border-gray-200 shadow-sm sticky top-24">
+                <h2 class="text-xl font-bold font-serif mb-6 border-b pb-2 flex items-center gap-2"><i class="ph ph-shopping-cart"></i> Đơn hàng của bạn</h2>
+                
+                <!-- script.js sẽ tự động render các sản phẩm vào thẻ div này -->
+                <div id="cart-items" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 mb-6 scrollbar-thin">
+                </div>
+
+                <div class="border-t pt-4 space-y-3 text-sm">
+                    <div id="checkout-discount-box" class="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm hidden">
+                        <p class="font-medium text-yellow-800 flex justify-between">
+                            <span>Ưu đãi hạng <span id="cart-rank-name" class="font-bold">Đồng</span>:</span>
+                            <span id="cart-discount-amount" class="font-bold">-0đ</span>
+                        </p>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Tạm tính:</span>
+                        <span id="cart-subtotal" class="font-medium">0đ</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Phí vận chuyển:</span>
+                        <span class="font-medium">Miễn phí</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg pt-3 border-t text-black mt-2">
+                        <span>Tổng cộng:</span>
+                        <span id="cart-total" class="text-red-600">0đ</span>
+                    </div>
+                </div>
+
+                <!-- Khung thông tin ngân hàng (đã chuyển sang cột phải) -->
+                <div id="bank-details" class="hidden mt-6 p-5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-900 flex flex-col items-center gap-4">
+                    <p class="font-bold text-base">Quét mã QR để thanh toán</p>
+                    <div class="w-56 h-56 bg-white p-2 rounded-xl border border-blue-200 shadow-sm">
+                        <img id="bank-qr-img" src="https://img.vietqr.io/image/vietcombank-0123456789-compact2.png?accountName=NGUYEN%20THANH%20LUAN" alt="Mã QR" class="w-full h-full object-contain">
+                    </div>
+                    <div class="space-y-2 w-full bg-white p-4 rounded-lg border border-blue-100 shadow-sm">
+                        <p class="flex justify-between"><span>Ngân hàng:</span> <strong>Vietcombank</strong></p>
+                        <p class="flex justify-between"><span>Chủ tài khoản:</span> <strong>NGUYEN THANH LUAN</strong></p>
+                        <p class="flex justify-between"><span>Số tài khoản:</span> <strong>0123456789</strong></p>
+                        <div class="pt-3 mt-3 border-t border-gray-100 flex flex-col">
+                            <span class="text-gray-500 mb-1">Nội dung chuyển khoản:</span>
+                            <strong id="bank-memo" class="text-center text-xl text-blue-600 break-all tracking-wider">SĐT của bạn</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Các thẻ ẩn giúp script.js không báo lỗi vì thiếu Element của trang chủ -->
+        <span id="cart-badge" class="hidden"></span>
+        <div id="cart-overlay" class="hidden"></div>
+        <div id="cart-drawer" class="translate-x-full hidden"></div>
+        
+        <!-- TOAST THÔNG BÁO -->
+        <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded shadow-xl text-sm z-50 flex items-center gap-2 pointer-events-none">
+            <i class="ph ph-info text-blue-400 text-lg"></i>
+            <span id="toast-message">Thông báo</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Tự động điền Email và Tên nếu khách hàng đã Đăng nhập trước đó
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const savedUser = localStorage.getItem('perfumeCurrentMember');
+                if (savedUser) {
+                    const user = JSON.parse(savedUser);
+                    document.getElementById('checkout-email').value = user.email || '';
+                    document.getElementById('checkout-name').value = user.name || '';
+                }
+            }, 300); // Đợi script.js render xong
+
+            // Tự động cập nhật nội dung chuyển khoản theo SĐT nhập vào
+            document.getElementById('checkout-phone').addEventListener('input', (e) => {
+                const phone = e.target.value || 'SĐT của bạn';
+                document.getElementById('bank-memo').innerText = phone;
+                updateQRCode(phone);
+            });
+
+            // Tự động đồng bộ số tiền QR khi khách thay đổi số lượng giỏ hàng
+            setTimeout(() => {
+                updateQRCode(document.getElementById('checkout-phone').value || 'SĐT của bạn');
+                const observer = new MutationObserver(() => {
+                    updateQRCode(document.getElementById('checkout-phone').value || 'SĐT của bạn');
+                });
+                const totalEl = document.getElementById('cart-total');
+                if (totalEl) observer.observe(totalEl, { childList: true, subtree: true, characterData: true });
+            }, 500);
+        });
+
+        // Cập nhật mã QR với số tiền và nội dung tự động
+        const updateQRCode = (phone) => {
+            const totalEl = document.getElementById('cart-total');
+            const total = totalEl && totalEl.dataset.rawTotal ? totalEl.dataset.rawTotal : 0;
+            const qrImg = document.getElementById('bank-qr-img');
+            if (qrImg) {
+                const encodedMemo = encodeURIComponent(phone === 'SĐT của bạn' ? '' : phone.replace(/ /g, ''));
+                qrImg.src = `https://img.vietqr.io/image/vietcombank-0123456789-compact2.png?amount=${total}&addInfo=${encodedMemo}&accountName=NGUYEN%20THANH%20LUAN`;
+            }
+        };
+
+        // Hiển thị/ẩn thông tin chuyển khoản
+        const toggleBankDetails = () => {
+            const isBank = document.querySelector('input[name="payment-method"]:checked').value === 'bank';
+            const bankDetails = document.getElementById('bank-details');
+            if (isBank) {
+                bankDetails.classList.remove('hidden');
+                updateQRCode(document.getElementById('checkout-phone').value || 'SĐT của bạn');
+            } else {
+                bankDetails.classList.add('hidden');
+            }
+        };
+
+        // Hàm xử lý hoàn tất thanh toán
+        const handleRealCheckout = (e) => {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                showToast('Giỏ hàng trống! Vui lòng thêm sản phẩm.', true);
+                return;
+            }
+
+            // Đổi trạng thái hiển thị loading
+            const mainBtn = document.getElementById('main-submit-btn');
+            mainBtn.innerHTML = '<i class="ph ph-spinner animate-spin text-lg"></i> Đang xử lý...';
+            mainBtn.disabled = true;
+
+            // Kích hoạt hàm processCheckout() của script.js qua nút ẩn
+            const hiddenBtn = document.querySelector('button[onclick="processCheckout()"]');
+            if(hiddenBtn) hiddenBtn.click();
+            
+            // Chuyển về trang chủ sau khi popup alert() xuất hiện
+            setTimeout(() => {
+                if (cart.length === 0) {
+                    window.location.href = 'thanh_luan_perfume_html.html';
+                }
+            }, 1000); // script.js có hàm setTimeout 1.5s
+        };
+    </script>
+</body>
+</html>

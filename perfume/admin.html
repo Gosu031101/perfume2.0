@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin - Quản lý Dữ liệu Thành Luân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<div class="max-w-[1200px] mx-auto p-4 md:p-8">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-2xl font-bold font-serif">Trang Quản Trị - Thành Luân</h1>
+        <a href="thanh_luan_perfume_html.html" class="text-sm text-blue-600 hover:underline"><i class="ph ph-arrow-left"></i> Về trang khách hàng</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+        <h2 class="text-lg font-bold mb-4 border-b pb-2 flex items-center gap-2"><i class="ph ph-database"></i> Quản lý Data Sản phẩm (Excel)</h2>
+        <div class="flex gap-4">
+            <button onclick="downloadSampleExcel()" class="bg-white border border-blue-200 text-blue-700 px-4 py-2 rounded font-medium hover:bg-blue-50 transition">
+                Tải file Mẫu Excel
+            </button>
+            <label class="bg-black text-white px-4 py-2 rounded font-medium cursor-pointer hover:bg-gray-800 transition">
+                Tải lên Data Sản Phẩm
+                <input type="file" id="excel-upload" accept=".xlsx, .xls, .ods, .csv" class="hidden" onchange="handleExcelUpload(event)">
+            </label>
+        </div>
+        <p class="text-sm text-gray-500 mt-4">Sau khi tải lên thành công, dữ liệu sẽ được lưu lại. Bạn có thể sang trang khách hàng để xem sự thay đổi.</p>
+    </div>
+
+    <div>
+        <div class="flex justify-between items-end mb-6">
+            <h3 class="font-serif text-xl font-bold border-b-2 border-black pb-1">Bản xem trước sản phẩm</h3>
+            <span id="product-count" class="text-sm text-gray-500">0 sản phẩm</span>
+        </div>
+        
+        <div id="product-list" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 opacity-60 pointer-events-none"></div>
+        <div id="load-more-container" class="mt-10 text-center hidden"><button id="load-more-btn" onclick="loadMoreProducts()"></button></div>
+    </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded shadow-xl text-sm z-50 flex items-center gap-2 pointer-events-none">
+    <i class="ph ph-info text-blue-400 text-lg"></i><span id="toast-message">Thông báo</span>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+//admin@thanhluan.com
+//admin123
